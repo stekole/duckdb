@@ -19,7 +19,8 @@ static inline void TemplatedReverseMemCpy(const data_ptr_t &__restrict dest, con
 }
 
 static inline void ReverseMemCpy(const data_ptr_t &__restrict dest, const const_data_ptr_t &__restrict src,
-                                 const idx_t &length) {
+                                 const idx_t &length, const idx_t max_size) {
+	D_ASSERT(length <= max_size);
 	for (idx_t i = 0; i < length; i++) {
 		dest[i] = src[length - 1 - i];
 	}
@@ -37,7 +38,7 @@ static inline RESULT_TYPE StringCompressInternal(const string_t &input) {
 		memset(result_ptr, '\0', REMAINDER);
 	} else {
 		const auto remainder = sizeof(RESULT_TYPE) - input.GetSize();
-		ReverseMemCpy(result_ptr + remainder, data_ptr_cast(input.GetPointer()), input.GetSize());
+		ReverseMemCpy(result_ptr + remainder, data_ptr_cast(input.GetPointer()), input.GetSize(), sizeof(RESULT_TYPE) - remainder);
 		memset(result_ptr, '\0', remainder);
 	}
 	result_ptr[0] = UnsafeNumericCast<data_t>(input.GetSize());
